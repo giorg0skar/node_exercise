@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import apiRouter from "./routes/api";
 const app = express();
 
 app.use(
@@ -30,10 +31,7 @@ app.use((req, res, next) => {
   next(); // Go to next middleware
 });
 
-app.get("/hello", (req, res, _next) => {
-  res.status(200).json({ message: "Hello to you too" });
-  return;
-});
+app.use("/", apiRouter);
 
 app.use((req, res, next) => {
   const error = new Error("No route was found for this request!");

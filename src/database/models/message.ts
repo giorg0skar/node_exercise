@@ -13,11 +13,11 @@ export const Message = sequelize.define("message", {
   },
 
   sender: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
   },
 
-  retriever: {
-    type: DataTypes.STRING,
+  receiver: {
+    type: DataTypes.INTEGER,
   },
 
   seen: {
@@ -28,6 +28,15 @@ export const Message = sequelize.define("message", {
     type: DataTypes.DATE,
   },
 });
+
+export interface MessageEntry {
+  id?: number;
+  content?: string;
+  sender?: number;
+  receiver?: number;
+  seen?: boolean;
+  timestampSent?: Date;
+}
 
 export const messageProperties = [
   "id",

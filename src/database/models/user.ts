@@ -29,6 +29,15 @@ export const User = sequelize.define("user", {
   },
 });
 
+export interface UserEntry {
+  id?: number;
+  name?: string;
+  surname?: string;
+  dateOfBirth?: Date;
+  gender?: string;
+  username?: string;
+}
+
 export const userProperties = [
   "id",
   "name",

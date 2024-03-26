@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize";
 
-const DB_NAME = "myDB";
-const DB_USER = "myuser";
-const DB_PASSWORD = "pass";
+const DB_NAME = "pccw_db";
+const DB_USER = "pccw_user";
+const DB_PASSWORD = "pccw_password";
 const DB_HOST = "postgres_db"; // This MUST match the service name in docker-compose.yml
 
 export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
@@ -22,5 +22,3 @@ export const testDbConnection = async () => {
 if (!sequelize) {
   testDbConnection();
 }
-
-// export default { sq: sequelize, testDbConnection };
