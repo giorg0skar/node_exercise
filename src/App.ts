@@ -31,7 +31,9 @@ app.use((req, res, next) => {
   next(); // Go to next middleware
 });
 
-app.use("/", apiRouter);
+// app.use(express.static(path.join(__dirname, "client", "build")));
+
+app.use("/api", apiRouter);
 
 app.use((req, res, next) => {
   const error = new Error("No route was found for this request!");

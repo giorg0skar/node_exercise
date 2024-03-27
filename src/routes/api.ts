@@ -66,10 +66,11 @@ router.post("/feedDB", async (req, res) => {
 });
 
 router.post("/users", async (req, res) => {
-  // Check the parameters in the request body
+  // We search for users that satisfy all criteria in the request body.
   const queryParamsToFindUsers = {};
 
   for (const [key, value] of Object.entries(req?.body ?? {})) {
+    // We ignore parameters that are not valid columns in the Users table.
     if (userProperties.includes(key)) {
       queryParamsToFindUsers[key] = value;
     }
@@ -84,7 +85,7 @@ router.get("/discussion", async (req, res) => {
   const id1 = Number(userId1);
   const id2 = Number(userId2);
 
-  if (!userId1 || !userId2 || id1 === id2) {
+  if (isNaN(id1) || isNaN(id2) || id1 === id2) {
     res.status(400).json("Please give 2 different valid user id's");
     return;
   }
@@ -107,6 +108,19 @@ router.get("/discussion", async (req, res) => {
     res.status(400).json({ error });
     return;
   }
+});
+
+router.post("/userChat/:id", async (req, res) => {
+  // Retrieve a list of users that exchanged messages with the user with the given id. Sort by most recent message.
+  // Idea: Get all messages that the user has sent or received and keep the receiver and sender ids. Keep a list of the unique ones and remove userId from that list.
+
+  const userId = Number(req.params.id);
+
+  if (isNaN(userId)) {
+    res.status(400).json("Invalid user id given");
+    return;
+  }
+  res.status(200).json([]);
 });
 
 export default router;
