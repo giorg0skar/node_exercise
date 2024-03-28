@@ -104,7 +104,6 @@ router.get("/discussion", async (req, res) => {
 
     res.status(200).json({ messagesSentBetweenUsers });
   } catch (error) {
-    console.error(error);
     res.status(400).json({ error });
     return;
   }
@@ -112,15 +111,53 @@ router.get("/discussion", async (req, res) => {
 
 router.post("/userChat/:id", async (req, res) => {
   // Retrieve a list of users that exchanged messages with the user with the given id. Sort by most recent message.
-  // Idea: Get all messages that the user has sent or received and keep the receiver and sender ids. Keep a list of the unique ones and remove userId from that list.
-
   const userId = Number(req.params.id);
-
   if (isNaN(userId)) {
     res.status(400).json("Invalid user id given");
     return;
   }
-  res.status(200).json([]);
+
+  const receiverAndSenderIds = await Message.findAll({
+    attributes: ["sender", "receiver"],
+    where: {
+      [Op.or]: [{ sender: userId }, { receiver: userId }],
+    },
+    order: [[sequelize.fn("max", sequelize.col("timestampSent")), "DESC"]],
+    group: "id",
+  });
+
+  if (!receiverAndSenderIds || receiverAndSenderIds.length === 0) {
+    res.status(404).json("No message found for the given user id");
+    return;
+  }
+
+  const userIdsThatExchangedMessages: number[] = [];
+  receiverAndSenderIds?.forEach((modelObjectWithIds) => {
+    const { sender, receiver } = modelObjectWithIds.dataValues;
+    if (sender !== userId) {
+      userIdsThatExchangedMessages.push(sender);
+    }
+    if (receiver !== userId) {
+      userIdsThatExchangedMessages.push(receiver);
+    }
+  });
+
+  // We keep the unique ids that exhanged messages with the requested user.
+  const set = new Set(userIdsThatExchangedMessages);
+  const uniqueIdsThatExchangedMessage = [...set];
+
+  // Since the unique ids array has the correct order of the most recently found user, we want to keep the same order in our query results.
+  // This solution works using PostgreSQL's array_position() function.
+  const usersThatExchangedMessages = await User.findAll({
+    where: {
+      id: uniqueIdsThatExchangedMessage,
+    },
+    order: sequelize.literal(
+      `array_position(ARRAY[${uniqueIdsThatExchangedMessage.join(",")}], id)`
+    ),
+  });
+
+  res.status(200).json(usersThatExchangedMessages);
 });
 
 export default router;
