@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./App.css";
-import { Form, Link, Outlet, useNavigate } from "react-router-dom";
 import UserHome from "./components/userHome";
+import { backendBaseUrl } from "./helpers";
 
 function App() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
-  // const navigate = useNavigate();
-  const baseUrl = "http://localhost:3000";
 
   const feedDBWithData = async () => {
     try {
-      const response = await fetch(baseUrl + "/api/feedDB", { method: "POST" });
+      const response = await fetch(backendBaseUrl + "/api/feedDB", {
+        method: "POST",
+      });
       const data = await response.json();
       if (data) {
         setNotificationMessage(data?.message || "");
@@ -33,7 +33,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         {notificationMessage && (
-          <div className="h3 d-flex gap-3 align-items-center bg-primary">
+          <div className="h3 d-flex gap-3 align-items-center bg-success">
             <p className="my-1">{notificationMessage}</p>
             <button
               className="btn fs-5 py-1"
@@ -49,10 +49,6 @@ function App() {
         </button>
 
         <div className="d-flex flex-column gap-2 my-4">
-          {/* <Form method="post" action="/usersHome">
-            <input type="text"></input>
-            <button type="submit">Go</button>
-          </Form> */}
           <form onSubmit={handleSubmit}>
             <label>
               Add a user's id to see their details:
@@ -60,9 +56,7 @@ function App() {
             </label>
             <button type="submit">Go</button>
           </form>
-          {/* <Link to={"/userHome/2"}>Click to display a User's home page</Link> */}
         </div>
-        {/* <Outlet /> */}
         {selectedUser && <UserHome userId={selectedUser} />}
       </header>
     </div>
